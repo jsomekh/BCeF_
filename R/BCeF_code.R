@@ -6,6 +6,7 @@
 #'
 #' This function allows you to plot the ROC curves and AUC.
 #' @param gold.standard.bool is a boolean vector representing the the gold standard.
+#' @param predictor.df
 #' @keywords fff
 #' @export
 #' @examples
