@@ -4,7 +4,7 @@
 
 #' A plot.roc.AUC Function
 #'
-#' This function allows you to express your love of cats.
+#' This function allows you to plot the ROC curves and AUC.
 #' @param gold.standard.bool is a boolean vector representing the the gold standard.
 #' @keywords fff
 #' @export
