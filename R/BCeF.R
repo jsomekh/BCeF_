@@ -29,20 +29,20 @@ BCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edat
   adjusted.reads      = t(lm.fitted.edata$residuals)#the residuals after djustment, after transpose to the data
   
   #generate the ROC, AUC comparing raw and adjusted data
-  gold.standard.to.use            = input.gold.standard
-  colnames(giant.all.gold)        = c("Gene1","Gene2","Confidence")
-  rownames(gold.standard.to.use)  = c(1:nrow(gold.standard.to.use))
+  #gold.standard.to.use            = input.gold.standard
+  colnames(input.gold.standard)  = c("Gene1","Gene2","Confidence")
+  rownames(input.gold.standard)  = c(1:nrow(input.gold.standard))
   
-  bins.cors.df                  = gold.standard.to.use
+  bins.cors.df                  = input.gold.standard
   bins.cors.df$binAll.raw.r     = NA#add a zero column
   bins.cors.df$binAll.raw.pval  = NA
   bins.cors.df$binAll.r         = NA#add a zero column
   bins.cors.df$binAll.pval      = NA
   
-  for(j in 1:nrow(gold.standard.to.use))
+  for(j in 1:nrow(input.gold.standard))
   {
-    gene1.ensmbl = gold.standard.to.use$Gene1[j]
-    gene2.ensmbl = gold.standard.to.use$Gene2[j]
+    gene1.ensmbl = input.gold.standard$Gene1[j]
+    gene2.ensmbl = input.gold.standard$Gene2[j]
     
     if( (gene1.ensmbl %in% rownames(raw.edata)) & (gene2.ensmbl %in% rownames(raw.edata)))
     {
