@@ -1,79 +1,35 @@
-
-# biocLite("pROC")
-#library("pROC")
-
-#' A plot.roc.AUC Function
-#'
-#' This function allows you to plot the ROC curves and AUC.
-#' @param gold.standard.bool is a boolean vector representing the the gold standard.
-#' @param predictor.df
-#' @keywords fff
+#' Generates roc curve that evaluates the performance of an expression dataset against raw data to predict gold standard network 
+#' This package adjust the gene expression dataset with confounders using multiple linear regression model and then evaluates the performance of co-expression gene-gene pairs of adjusted and raw data against a gold standard co-expression netwrok.in the ourput plot the raw data is a ROC curve olored in black and the adjusted data is colored in red
+#' @param input.edata the raw expression data set to be adjusted. Rows represent the genes/probes and columns represent samples.
+#' @param input.covariates.df the covariate dataframe. each covariate, a dataframe column, can represent known covariate such as batch number or age and hidden covariates such as a principle component
+#' @param input.gold.standard a gold standard that includes gene-gene coexpression confidence. a dataframe should be givven as input. the first column represent the first gene, the second column the second gene and the third columns is 1 for true associations and 0 for false associations. gene/probe number/symbol in the gold standard and the expression data set should match.
+#' @param input.edata.description the description of the dataset. will be the title of the generated plot.
+#' @param input.adjustment.method.description the description of the covariates used (e.g., 4 first principle components). will be included in the title of the generated plot.
+#' @return 0 if error occured
 #' @export
-#' @examples
-#' BCeF()
-plot.roc.AUC<-function(gold.standard.bool, predictor.df, main.text, legend.to.use, color.to.use)
+BCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edata.description = "", input.adjustment.method.description = "", color.to.use = c("red","black"))
 {
-  # browser()
-  if(length(gold.standard.bool) != nrow(predictor.df))
+  if(length(gold.standard.to.use) != nrow(input.covariates.df))
   {
-    print("error gold standard and predictor has different length")
+    print("error: gold standard and predictor has different length")
     return(0)
   }
-  cases.gold = length(which(gold.standard.bool==1))
-  
-  roc_obj_linear = roc(gold.standard.bool, predictor.df[,1])
-  l.auc = auc(roc_obj_linear)
-  plot(roc_obj_linear, 
-       main = paste0(main.text, ",cases==1:",cases.gold),
-       col = color.to.use[1],
-       cex.main=0.8)
-  auc.vec<-l.auc
-  final.legend.to.use = paste0(legend.to.use[1], " (auc=",round(l.auc,3),")")
-  
-  for(i in 2:ncol(predictor.df))
+  if(ncols(input.edata) != nrow(input.covariates.df))
   {
-    roc_obj_tmp = roc(gold.standard.bool, predictor.df[,i])
-    tmp.auc = auc(roc_obj_tmp)
-    lines(roc_obj_tmp, col = color.to.use[i])
-    final.legend.to.use = c(final.legend.to.use, paste0(legend.to.use[i], " (auc=",round(tmp.auc,3),")"))
+    print("error: covariates and edata has different number of samples")
+    return(0)
   }
-  
-  legend("bottomright",cex=1,
-         legend = final.legend.to.use, 
-         col = color.to.use, 
-         lwd = 0.8, 
-         lty = c(1,1,1,1))#type of line
-  
-}
-#########################################################################################
-# the function generates performance (ROC and AUC) of adjusted data against raw data
-# input:
-#   input.edata, input.covariates.df, input.edata.description, gold.standard
-# giant.all.gold -  a dataframe, first column is gene 1, second column is gene2, third columns is 1 for true associations and 0 for false associations
-#                   the gene names or symbols should match between the edata and the gold standard
-# input.covariates.df - this can include, known or unknown covariates, each as a vector in the pheno dataframe
-# in the ourput plot the raw data is ROC curve is colored in black and the adjusted data roc curve is colored in red
-#########################################################################################
-#' A BCeF Function
-#'
-#' This function allows you to express your love of cats.
-#' @param input.edata the expression data set to be adjusted.
-#' @keywords fff
-#' @export
-#' @examples
-#' BCeF()
-BCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edata.description = "", input.adjustment.method.description = "")
-{
-  #load the normalized data per tissue
-  raw.edata = as.matrix(input.edata) #file.name.to.load(ts.list[i])
+  #load the normalized raw data
+  raw.edata = as.matrix(input.edata)
+  t.raw.edata = t(raw.edata)
   ##adjust with linear regression
   factors             = sapply(1:ncol(input.covariates.df), function(x) paste0("pheno.f[,", x,"]"))
-  my.formula          = reformulate(termlabels = factors, response = 'raw.edata')
-  lm.fitted.edata     = lm(my.formula)
-  adjusted.reads      = t(lm.fitted.edata$residuals)#the residuals aftera djustment
+  my.formula          = reformulate(termlabels = factors, response = 't.raw.edata')
+  lm.fitted.edata     = stats::lm(my.formula)
+  adjusted.reads      = t(lm.fitted.edata$residuals)#the residuals after djustment, after transpose to the data
   
   #generate the ROC, AUC comparing raw and adjusted data
-  gold.standard.to.use            = input.gold.standard#giant.adipose.net#giant.all.net#giant.adipose.net#giant.all.gold#giant.adipose.gold#giant.adipose.net#giant.all.gold#giant.adipose.gold#giant.all.gold#giant.all.net#giant.adipose.net#rbind(giant.all.CAV2.PLS3.net.cutoff.0.5, giant.all.CAV2.PLS3.net.cutoff.0.05)#giant.adipose.CAV2.PLS3.net.cutoff.0.5, giant.adipose.CAV2.PLS3.net.cutoff.0.05)#giant.adipose.CAV2.PLS3.net.cutoff.0.5#giant.adipose.INSR.net.cutoff.0.5#giant.adipose.CAV2.PLS3.net.cutoff.0.5
+  gold.standard.to.use            = input.gold.standard
   colnames(giant.all.gold)        = c("Gene1","Gene2","Confidence")
   rownames(gold.standard.to.use)  = c(1:nrow(gold.standard.to.use))
   
@@ -85,25 +41,25 @@ BCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edat
   
   for(j in 1:nrow(gold.standard.to.use))
   {
-    gene1.ensmbl = get.ensmbl(gold.standard.to.use$Gene1[j])[1]
-    gene2.ensmbl = get.ensmbl(gold.standard.to.use$Gene2[j])[1]
+    gene1.ensmbl = gold.standard.to.use$Gene1[j]
+    gene2.ensmbl = gold.standard.to.use$Gene2[j]
     
     if( (gene1.ensmbl %in% rownames(raw.edata)) & (gene2.ensmbl %in% rownames(raw.edata)))
     {
       gene1.bin.all.raw.vec   = gene2.bin.all.raw.vec = 0
       gene1.bin.all.raw.vec   = raw.edata[gene1.ensmbl,]
       gene2.bin.all.raw.vec   = raw.edata[gene2.ensmbl,]
-      result.all.raw          = cor.test(gene1.bin.all.raw.vec, gene2.bin.all.raw.vec, method = "spearman")
+      result.all.raw          = stats::cor.test(gene1.bin.all.raw.vec, gene2.bin.all.raw.vec, method = "spearman")
       
       gene1.bin.all.vec       = gene2.bin.all.vec = 0
       gene1.bin.all.vec       = adjusted.reads[gene1.ensmbl,]
       gene2.bin.all.vec       = adjusted.reads[gene2.ensmbl,]
-      result.all              = cor.test(gene1.bin.all.vec, gene2.bin.all.vec, method = "spearman")
+      result.all              = stats::cor.test(gene1.bin.all.vec, gene2.bin.all.vec, method = "spearman")
       
-      bins.cors.df[j,"binAll.r"] = result.all$estimate 
-      bins.cors.df[j,"binAll.raw.r"] = result.all.raw$estimate
+      bins.cors.df[j,"binAll.r"]        = result.all$estimate 
+      bins.cors.df[j,"binAll.raw.r"]    = result.all.raw$estimate
       bins.cors.df[j,"binAll.raw.pval"] = result.all.raw$p.value
-      bins.cors.df[j,"binAll.pval"] = result.all$p.value
+      bins.cors.df[j,"binAll.pval"]     = result.all$p.value
     }else{
       print(paste0(j," is index of not found gene in edata"))
       j = j+1
@@ -113,22 +69,39 @@ BCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edat
   bins.cors.df            = bins.cors.df[-c(which(is.na(bins.cors.df$binAll.raw.r))),]
   rownames(bins.cors.df)  = c(1:nrow(bins.cors.df))
   gold.standard.bool      = bins.cors.df$Confidence
-  pvals.df.log = 0
-  pvals.df.log = -log(pvals.df,10)
-  tmp = pvals.df.log
+  pvals.df.log            = 0
+  pvals.df.log            = -log(pvals.df,10)
+  tmp                     = pvals.df.log
   tmp[is.infinite(tmp)]<-0
-  max.val = max(tmp)
+  max.val                 = max(tmp)
   pvals.df.log[is.infinite(pvals.df.log)]<-(max.val+10)#change Inf to max value
-  pvals.df.log  = pvals.df.log[,c(input.adjustment.method.description, "Raw")]
-  legend.to.use = c(input.adjustment.method.description, "Raw")
-  color.to.use  = c("red","black")
+  pvals.df.log            = pvals.df.log[,c(input.adjustment.method.description, "Raw")]
+  legend.to.use           = c(input.adjustment.method.description, "Raw")
   
-  plot.roc.AUC(gold.standard.bool, 
-                   pvals.df.log, 
-                   input.edata.description, 
-                   legend.to.use, 
-                   color.to.use)
+  cases.gold = length(which(gold.standard.bool==1))
   
+  roc_obj_linear = pROC::roc(gold.standard.bool, pvals.df.log[,1])
+  l.auc = pROC::auc(roc_obj_linear)
+  plot(roc_obj_linear, 
+       main = paste0(input.edata.description, ",cases==1:",cases.gold),
+       col = color.to.use[1],
+       cex.main=0.8)
+  auc.vec<-l.auc
+  final.legend.to.use = paste0(legend.to.use[1], " (auc=",round(l.auc,3),")")
+  
+  for(i in 2:ncol(predictor.df))
+  {
+    roc_obj_tmp = pROC::roc(gold.standard.bool, predictor.df[,i])
+    tmp.auc = pROC::auc(roc_obj_tmp)
+    lines(roc_obj_tmp, col = color.to.use[i])
+    final.legend.to.use = c(final.legend.to.use, paste0(legend.to.use[i], " (auc=",round(tmp.auc,3),")"))
+  }
+  
+  legend("bottomright",cex=1,
+         legend = final.legend.to.use, 
+         col = color.to.use, 
+         lwd = 0.8, 
+         lty = c(1,1,1,1))#type of line
 }
 
 
