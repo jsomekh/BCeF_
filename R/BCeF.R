@@ -7,7 +7,7 @@
 #' @param input.adjustment.method.description the description of the covariates used (e.g., 4 first principle components). will be included in the title of the generated plot.
 #' @return 0 if error occured
 #' @export
-BCeF_<-function(input.edata, input.covariates.df, input.gold.standard, input.edata.description = "", input.adjustment.method.description = "adjusted", color.to.use = c("black","red"))
+myBCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edata.description = "", input.adjustment.method.description = "adjusted", color.to.use = c("black","red"))
 {
   if(ncol(input.edata) != nrow(input.covariates.df))
   {
