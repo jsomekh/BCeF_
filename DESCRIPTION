@@ -1,6 +1,6 @@
 Package: BCeF
 Title: Evaluation of batch correction against the raw data
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Judith", "Somekh", email = "judith_somekh@hms.harvard.edu", role = c("aut", "cre"))
 Description: Generates roc curves that evaluates the performance of co-expression gene-gene pairs in adjusted expression dataset against against the raw data to predict a gold standard co-association network 
 Depends: R (>= 3.1.3)
