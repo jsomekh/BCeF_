@@ -28,3 +28,4 @@ BCeF(input.edata, input.covariates.df, input.gold.standard,
 Generates roc curve that evaluates the performance of an expression dataset against raw data to predict gold standard network
 This package adjust the gene expression dataset with confounders using multiple linear regression model and then evaluates the performance of co-expression gene-gene pairs of adjusted and raw data against a gold standard co-expression netwrok.in the ourput plot the raw data is a ROC curve olored in black and the adjusted data is colored in red
 }
+
