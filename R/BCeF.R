@@ -11,7 +11,7 @@ BCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edat
 {
   if(ncol(input.edata) != nrow(input.covariates.df))
   {
-    print("error: covariates and edata has different number of samples")
+    print("error: covariates and input.edata has different number of samples")
     return(0)
   }
   #load the normalized raw data
@@ -56,7 +56,7 @@ BCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edat
       #bins.cors.df[j,"binAll.r"]        = result.all$estimate 
       bins.cors.df[j,"binAll.pval"]     = result.all$p.value
     }else{
-      print(paste0(j," is index of not found gene in edata"))
+      print(paste0(j," is index of not found gene in input.edata"))
       j = j+1
     }
   }
@@ -107,5 +107,4 @@ BCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edat
          lwd    = 0.8, 
          lty    = c(1,1,1,1))#type of line
 }
-
 
