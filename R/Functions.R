@@ -9,7 +9,7 @@
 #' @export
 plotBCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edata.description = "", input.adjustment.method.description = "adjusted", color.to.use = c("black","red"))
 {
-  if(require("pROC")){
+  if(!require("pROC")){
     print("error: pROC package was not installed")
     return(0)
   }
