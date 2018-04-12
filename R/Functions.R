@@ -9,6 +9,7 @@
 #' @export
 plotBCeF<-function(input.edata, input.covariates.df, input.gold.standard, input.edata.description = "", input.adjustment.method.description = "adjusted", color.to.use = c("black","red"))
 {
+  require("pROC")
   if(ncol(input.edata) != nrow(input.covariates.df))
   {
     print("error: covariates and input.edata has different number of samples")
